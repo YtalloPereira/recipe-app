@@ -4,6 +4,6 @@ data class Recipe(
     val id: Int,
     val title: String,
     val image: String,
-    val ingredients: List<String>? = null,
+    val ingredients: List<Ingredient>? = null,
     val analyzedInstructions: List<AnalyzedInstruction>? = null
 )
