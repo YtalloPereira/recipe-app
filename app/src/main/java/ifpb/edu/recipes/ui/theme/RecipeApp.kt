@@ -50,7 +50,6 @@ fun RecipeApp() {
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
         if (recipes.isEmpty()) {
-            // Estado de carregamento ou vazio
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -73,6 +72,16 @@ fun RecipeApp() {
                                     null
                                 }
 
+                                // Processar ingredientes e adicionar URLs completas
+                                val processedIngredients = ingredientResponse?.ingredients?.map { ingredient ->
+                                    val imageUrl = if (ingredient.image?.startsWith("http") == true) {
+                                        ingredient.image
+                                    } else {
+                                        "https://spoonacular.com/cdn/ingredients_100x100/${ingredient.image}"
+                                    }
+                                    ingredient.copy(image = imageUrl)
+                                }
+
                                 // Carregar instruções
                                 val instructions = try {
                                     RetrofitInstance.api.getInstructions(recipeId)
@@ -81,11 +90,10 @@ fun RecipeApp() {
                                     null
                                 }
 
-                                // Encontrar o índice da receita
                                 val index = recipes.indexOfFirst { it.id == recipeId }
                                 if (index != -1) {
                                     val updatedRecipe = recipes[index].copy(
-                                        ingredients = ingredientResponse?.ingredients?.map { it.name },
+                                        ingredients = processedIngredients,
                                         analyzedInstructions = instructions
                                     )
                                     recipes[index] = updatedRecipe
