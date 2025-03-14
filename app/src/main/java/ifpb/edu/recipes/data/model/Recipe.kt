@@ -1,3 +1,8 @@
 package ifpb.edu.recipes.data.model
 
-data class Recipe(val id: Int, val title: String, val image: String)
+data class Recipe(
+    val id: Int,
+    val title: String,
+    val image: String,
+    val ingredients: List<String>? = emptyList()
+)
