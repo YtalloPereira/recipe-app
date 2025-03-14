@@ -1,5 +1,6 @@
 package ifpb.edu.recipes.ui.theme
 
+import android.util.Log
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -32,12 +33,27 @@ fun RecipeApp() {
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text("Receitas Deliciosas") })
+            TopAppBar(title = { Text(text = "Delicious Recipes") })
         }
     ) { paddingValues ->
         LazyColumn(modifier = Modifier.padding(paddingValues)) {
             items(recipes) { recipe ->
-                RecipeItem(recipe)
+                RecipeItem(recipe) { recipeId ->
+                    coroutineScope.launch {
+                        try {
+                            val ingredientResponse = RetrofitInstance.api.getIngredients(recipeId)
+                            val ingredientNames = ingredientResponse.ingredients.map { it.name }
+
+                            val index = recipes.indexOfFirst { it.id == recipeId }
+                            if (index != -1) {
+                                val updatedRecipe = recipes[index].copy(ingredients = ingredientNames)
+                                recipes[index] = updatedRecipe
+                            }
+                        } catch (e: Exception) {
+                            Log.e("RecipeApp", "Erro ao carregar ingredientes", e)
+                        }
+                    }
+                }
             }
         }
     }
